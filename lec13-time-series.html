@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Madeleine Bonsma-Fisher" />
+
+
+<title>Working with time series data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link rel="icon" type="image/png" href="image/favicon.png">
+<style type="text/css">
+
+table {
+    border-collapse: collapse;
+}
+
+thead {
+    border-top: solid #DCDCDC;
+    border-bottom: solid #DCDCDC;
+}
+
+tr.odd {
+    background-color: #F8F8F8;
+}
+
+tr:last-child {
+    border-bottom: solid #DCDCDC;
+}
+
+</style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 54px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h2 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h3 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h4 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h5 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h6 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EEB313H1</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-map-o"></span>
+     
+    Syllabus
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Lectures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="lec01-introduction.html">Sept. 10: Intro to course, programming, RStudio, and R Markdown</a>
+    </li>
+    <li>
+      <a href="lec02-basic-r.html">Sept. 12: Assignment, vectors, functions</a>
+    </li>
+    <li>
+      <a href="lec03-basic-r.html">Sept. 17: Data frames, intro to dplyr</a>
+    </li>
+    <li>
+      <a href="lec04-dplyr.html">Sept. 19: Data wrangling in dplyr, ggplot, tidy data</a>
+    </li>
+    <li>
+      <a href="lec05-dplyr.html">Sept. 24: More dplyr and ggplot</a>
+    </li>
+    <li class="dropdown-header">Sept. 26: Exploratory data analysis</li>
+    <li class="dropdown-header">Oct. 01: Linear models and statistical modelling</li>
+    <li class="dropdown-header">Oct. 03: Mixed effects models</li>
+    <li class="dropdown-header">Oct. 08: Simulating data: Randomization tests</li>
+    <li class="dropdown-header">Oct. 10: Multivariate stats</li>
+    <li class="dropdown-header">Oct. 15: Model selection</li>
+    <li class="dropdown-header">Oct. 17: Numerically solving population models</li>
+    <li class="dropdown-header">Oct. 22: Time series analysis</li>
+    <li class="dropdown-header">Oct. 24: Datasets, hypothesis, begin projects</li>
+    <li class="dropdown-header">Oct. 29: Reproducible science</li>
+    <li class="dropdown-header">Oct. 31: Reproducible science</li>
+    <li class="dropdown-header">Nov. 12: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 14: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 19: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 21: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 26: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 28: Project work (no lesson)</li>
+    <li class="dropdown-header">Dec. 03: Project work (no lesson)</li>
+    <li class="dropdown-header">Dec. 05: Group presentations (no lesson)</li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Assignments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Assignment 1</li>
+    <li class="dropdown-header">Assignment 2</li>
+    <li class="dropdown-header">Assignment 3</li>
+    <li class="dropdown-header">Assignment 4</li>
+    <li class="dropdown-header">Assignment 5</li>
+    <li class="dropdown-header">Assignment 6</li>
+    <li class="dropdown-header">Assignment 7</li>
+    <li class="dropdown-header">Assignment 8</li>
+    <li class="dropdown-header">Final project</li>
+  </ul>
+</li>
+<li>
+  <a href="resources.html">
+    <span class="fa fa-question"></span>
+     
+    Resources and FAQ
+  </a>
+</li>
+<li>
+  <a href="about.html">
+    <span class="fa fa-info"></span>
+     
+    About
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-bars"></span>
+     
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="mailto:ahmed.hasan@mail.utoronto.ca">
+        <span class="fa fa-envelope"></span>
+         
+        Contact
+      </a>
+    </li>
+    <li>
+      <a href="https://github.com/uoftcoders/rcourse">
+        <span class="fa fa-github"></span>
+         
+        GitHub
+      </a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Working with time series data</h1>
+<h4 class="author">Madeleine Bonsma-Fisher</h4>
+
+</div>
+
+
+<div id="lesson-preamble" class="section level2">
+<h2>Lesson preamble</h2>
+<p>This lesson uses data from the National Ecological Observatory Network (NEON) [<a href="https://www.neonscience.org/">link</a>]. This data is publicly available, along with lots of other cool ecological data.</p>
+<blockquote>
+<h3 id="learning-objectives">Learning objectives</h3>
+<ul>
+<li>Numerically solve differential equations with multiple initial conditions</li>
+<li>Work with and plot time series data</li>
+<li>Fit models to time series data (simulated and real)</li>
+</ul>
+<h3 id="lesson-outline">Lesson outline</h3>
+<p>Total lesson time: 2 hours</p>
+<ul>
+<li>Recap: drawing phase portraits and numerically solving differential equations (10 min)</li>
+<li>Numerical solutions with multiple initial conditions (10 min)</li>
+<li>Fitting models to data
+<ul>
+<li>Fitting simulated data (20 minutes)</li>
+<li>Exploring and plotting time series data (20 min)</li>
+<li>Fitting real data (40 minutes)</li>
+</ul></li>
+</ul>
+<h3 id="setup">Setup</h3>
+<ul>
+<li><code>install.packages('tidyverse')</code> (done already)</li>
+<li><code>install.packages('deSolve')</code> (done already)</li>
+<li>Download the data: <a href="https://github.com/UofTCoders/rcourse/blob/master/data/plant_phenology.csv" class="uri">https://github.com/UofTCoders/rcourse/blob/master/data/plant_phenology.csv</a></li>
+</ul>
+</blockquote>
+<hr />
+</div>
+<div id="recap" class="section level2">
+<h2>Recap</h2>
+<ul>
+<li><p>Drawing <strong>phase portraits</strong> in one dimension:</p>
+<ul>
+<li>Fixed points: values of <span class="math inline">\(N\)</span> at which <span class="math inline">\(\frac{dN}{dt}\)</span>, the rate of change of <span class="math inline">\(N\)</span>, is <span class="math inline">\(0\)</span>. To find fixed points, plot <span class="math inline">\(\frac{dN}{dt}\)</span> vs. <span class="math inline">\(N\)</span> and find the place(s) where it crosses the <span class="math inline">\(x\)</span> axis (<span class="math inline">\(y = 0\)</span>).</li>
+<li>Stability: if you start at some <span class="math inline">\(N\)</span> close to the fixed point but not exactly on it, will you go towards (stable) or away (unstable) from the fixed point? The sign of <span class="math inline">\(\frac{dN}{dt}\)</span> on either side of a fixed point tells you whether <span class="math inline">\(N\)</span> will increase or decrease in that area. Draw an arrow to the right if <span class="math inline">\(\frac{dN}{dt}\)</span> is positive, and draw an arrow to the left if <span class="math inline">\(\frac{dN}{dt}\)</span> is negative.</li>
+</ul></li>
+<li>Numerically solving differential equations in R: starting from an initial population size, calculate a sequence of population sizes using the information contained in the differential equation. The result is a <strong>trajectory</strong> of <span class="math inline">\(N\)</span> vs. time.
+<ul>
+<li>Using R’s ODE-solver <code>ode</code>: define a function that calculates <span class="math inline">\(\frac{dN}{dt}\)</span> for your model, making sure that it’s in the correct format with arguments <code>t</code>, <code>state</code>, and <code>parameters</code>. Call the function <code>ode</code> and give it the parameters <code>y = state, times = times,    func = logistic_fn, parms = parameters</code></li>
+</ul></li>
+</ul>
+</div>
+<div id="finding-numerical-solutions-with-multiple-initial-conditions" class="section level2">
+<h2>Finding numerical solutions with multiple initial conditions</h2>
+<p>Let’s make a pretty plot of numerical solutions for the logistic equation from a few different starting points.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># define function to be in the format that `ode` uses</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">logistic_fn &lt;-<span class="st"> </span><span class="cf">function</span>(t, state, parameters) {</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="co"># Calculates dN/dt for the logistic equation</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">  </a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">  <span class="co"># t: time point at which to evaluate derivative</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">  <span class="co"># state: vector of variables (here it&#39;s just N)</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">  <span class="co"># parameters: vector of model parameters c(r, K)</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">  </a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">  N &lt;-<span class="st"> </span>state </a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">  </a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">  r &lt;-<span class="st"> </span>parameters[<span class="st">&#39;r&#39;</span>] <span class="co"># get the element labelled &#39;r&#39;</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">  K &lt;-<span class="st"> </span>parameters[<span class="st">&#39;K&#39;</span>] <span class="co"># get the element labelled &#39;K&#39;</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">  <span class="co">#rate of change</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15">  dN &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span>N <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>N <span class="op">/</span><span class="st"> </span>K)</a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">    </a>
+<a class="sourceLine" id="cb1-17" data-line-number="17">  <span class="co">#return rate of change</span></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="kw">c</span>(dN)))</a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">}</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">library</span>(deSolve)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># Solve using ode</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># define parameters for the ode function</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">parameters &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">r =</span> <span class="fl">0.5</span>, <span class="dt">K =</span> <span class="dv">50</span>) <span class="co"># use named parameters for clarity</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">initial_conditions &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">10</span>, <span class="dv">80</span>, <span class="dt">by =</span> <span class="dv">10</span>) <span class="co"># a vector of initial conditions</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">15</span>, <span class="dt">by =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co"># run ode inside a loop to calculate trajectories for several initial conditions</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">initial_conditions =</span> <span class="kw">seq</span>(<span class="dv">10</span>, <span class="dv">80</span>, <span class="dt">by =</span> <span class="dv">10</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># CTRL-shift-m to make pipe</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="st">  </span><span class="co"># &#39;do&#39; is a dplyr function that returns a dataframe after doing a series of computations.</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="st">  </span><span class="co"># once the results are in a data frame, everything we&#39;ve learned about ggplot and dplyr can be used!</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="st">  </span><span class="kw">do</span>(<span class="kw">data.frame</span>( <span class="co"># &#39;data.frame&#39; converts the output of &#39;ode&#39; to a dataframe</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">    <span class="kw">ode</span>(</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">      <span class="dt">y =</span> initial_conditions, <span class="co"># each time the &#39;do&#39; loop runs, a new initial condition will be used</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">      <span class="dt">times =</span> times,</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">      <span class="dt">func =</span> logistic_fn,</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">      <span class="dt">parms =</span> parameters</a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">      )</a>
+<a class="sourceLine" id="cb3-19" data-line-number="19">  ))</a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co"># display the first few rows of the results</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="kw">head</span>(results)  </a></code></pre></div>
+<pre><code>##   time       X1       X2       X3       X4 X5       X6       X7       X8
+## 1 0.00 10.00000 20.00000 30.00000 40.00000 50 60.00000 70.00000 80.00000
+## 2 0.01 10.04006 20.06003 30.05997 40.03994 50 59.94021 69.86063 79.76131
+## 3 0.02 10.08024 20.12012 30.11988 40.07976 50 59.88083 69.72250 79.52522
+## 4 0.03 10.12054 20.18027 30.17973 40.11946 50 59.82187 69.58560 79.29169
+## 5 0.04 10.16096 20.24047 30.23951 40.15904 50 59.76332 69.44992 79.06069
+## 6 0.05 10.20150 20.30074 30.29924 40.19850 50 59.70517 69.31544 78.83217</code></pre>
+<p>This is exactly what we wanted. We have chosen a set of initial conditions (<code>seq(10, 80, by = 10)</code>) and created a dataframe that has one column of times (<code>time</code>) and a column for each trajectory resulting from each initial condition (<code>X1</code>, <code>X2</code>, …). Now we can use <code>ggplot</code> to plot all the trajectories.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># make a plot</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">results <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">    </span><span class="kw">gather</span>(Column, Value, <span class="op">-</span>time) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="st">    </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> Value, <span class="dt">color =</span> Column)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> Value)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;Population size&quot;</span>)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>This plot very nicely summarizes the behaviour of the logistic equation: it shows the path that the population size <span class="math inline">\(N\)</span> will take in time from several initial conditions. Importantly, the carrying capacity <span class="math inline">\(K\)</span> which we set to be <span class="math inline">\(50\)</span> is clearly a stable fixed point: all the trajectories go towards <span class="math inline">\(K\)</span>.</p>
+<div id="challenge" class="section level4">
+<h4>Challenge</h4>
+<p>Modify the plotting code above so that the legend lists the initial conditions for each line instead of <code>X1</code>, <code>X2</code>, etc.</p>
+</div>
+</div>
+<div id="fitting-models-to-data" class="section level2">
+<h2>Fitting models to data</h2>
+<p>Fitting data is something we’ve already spent a lot of time on in this course, and there are many different strategies for choosing parameters for a model depending on the assumptions you make about your data and model. Today we will use <strong>least squares</strong> to fit a model to time series data. I will show you a method for doing ‘brute force’ least squares fitting so that you can fit any model you like using the same procedure, but there are certain cases in which it is possible to use <code>lm</code> to fit your data.</p>
+<div id="fitting-simulated-data-with-a-single-parameter" class="section level3">
+<h3>Fitting simulated data with a single parameter</h3>
+<p>Suppose we repeatedly measure a bacterial population’s size over time, and suppose we want to fit our data to an exponential growth model.</p>
+<p>Let’s simulate some data from an exponential function to work with.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">by =</span> <span class="fl">0.2</span>) <span class="co"># sample times</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">r &lt;-<span class="st"> </span><span class="fl">0.2</span> <span class="co"># growth rate</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">N0 &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># initial population</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co"># use the function &#39;rnorm&#39; to add noise to the data</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">Ndata &lt;-<span class="st"> </span>N0<span class="op">*</span><span class="kw">exp</span>(r<span class="op">*</span>times) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="kw">length</span>(times), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.75</span>) </a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">Ndata[<span class="dv">1</span>] &lt;-<span class="st"> </span>N0 <span class="co"># fix the starting value to be N0 - this means we don&#39;t have to fit the intercept</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="kw">qplot</span>(times,Ndata) <span class="co"># check with a plot</span></a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Now let’s assume we don’t know the growth rate <span class="math inline">\(r\)</span> and we want to extract it from the data — we want to fit the data to an exponential growth model and find the value of <span class="math inline">\(r\)</span> that gives the best fit.</p>
+<p>To do this, we need a way to tell if a fit is good or bad. What criteria should we use to determine if a fit is good? One option is to just try several parameter values and try to manually adjust the parameter until the fit looks good. This is imprecise and not reproducible, but it’s often a good place to start to get an idea of what parameter range to check.</p>
+<p>The idea behind least squares fitting is that we want to minimize the difference between our model’s prediction and the actual data, and we do that by minimizing the sum of the <strong>squares</strong> of the <strong>residuals</strong>. Residuals (or <strong>errors</strong>) are the difference between the model and the data for each data point. The purpose of taking the square of each residual is to take out the influence of the sign of the residual.</p>
+<p>The sum of the squares of the residuals is just a number, and now we have a criteria we can use to determine which of two fits is better: whichever fit minimizes that number is the better fit.</p>
+<p>In practice, there are many ways to find the particular parameter that gives the best fit. One way is to start at some parameter value, then start adjusting it by small amounts and checking if the fit gets better or worse. If it gets worse, go in the other direction. If it gets better, keep going in that direction until it either starts getting worse again or the amount by which it gets better is very small. This type of algorithm is called <strong>gradient descent</strong>.</p>
+<p>Another option is to try a range of parameter values and choose the one that gives the best fit out of that list. This is simpler to implement than the previous algorithm, but it’s also computationally more costly: it can take a long time, especially if you don’t know which range of parameters to try ahead of time.</p>
+<p>We will do some examples of the second method today, what we’ll call ‘brute-force least squares’.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># Make a range of r parameter values to try</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">r_vals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.01</span>, <span class="fl">0.3</span>, <span class="dt">by =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># use the function &#39;sapply&#39; to loop over r_vals list</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># everything inside curly braces is a function that gets executed for each value of r</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">resids_sq &lt;-<span class="st"> </span><span class="kw">sapply</span>(r_vals, <span class="cf">function</span>(r) {</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">    prediction &lt;-<span class="st"> </span>Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r <span class="op">*</span><span class="st"> </span>times) <span class="co"># we&#39;re not fitting N0, just assuming it&#39;s the first data point</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">    residuals &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>Ndata</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">    <span class="kw">return</span>(<span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">})</a></code></pre></div>
+<p>(Read more about the <code>apply</code> family of functions in the <a href="https://www.rdocumentation.org/packages/base/versions/3.5.1/topics/lapply">documentation</a>.)</p>
+<p>Let’s plot the sum of residuals squared vs. <span class="math inline">\(r\)</span> to find which value of <span class="math inline">\(r\)</span> fits best:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">qplot</span>(r_vals, resids_sq)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>We can see visually that the minimum is around <span class="math inline">\(r = 0.2\)</span>, but to extract that number from the list we can use the function <code>which</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">best_fit &lt;-<span class="st"> </span><span class="kw">which</span>(resids_sq <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(resids_sq))</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">r_fit &lt;-<span class="st"> </span>r_vals[best_fit] </a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">r_fit</a></code></pre></div>
+<pre><code>## [1] 0.2</code></pre>
+<p>We got the ‘correct’ value of <span class="math inline">\(r\)</span>, the one that we originally used to simulate the data.</p>
+<p>Finally, let’s plot the fit against the original data:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">qplot</span>(times,Ndata) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> times, <span class="dt">y =</span> Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r_fit <span class="op">*</span><span class="st"> </span>times)))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Now let’s do the same using the <code>lm</code> function. To use the <code>lm</code> function to fit an arbitrary function, you need to be able to invert your function into the form <span class="math inline">\(y = \alpha + \beta x\)</span>. This is not always possible; for example, a function that is non-monotonic (goes up and down), such as a sine wave, can’t be inverted unambiguously. Here, our function is <span class="math inline">\(N = N_0 \text{e}^{rt}\)</span>, and since we want to extract the fit parameters <span class="math inline">\(r\)</span> and <span class="math inline">\(N_0\)</span>, we should get <span class="math inline">\(t\)</span> out of the exponent. Taking the logarithm of both sides, we get</p>
+<p><span class="math display">\[\text{log}N=\text{log}N_0 + rt\]</span></p>
+<p>Remember that the natural logarithm (<code>log</code> in R and written <span class="math inline">\(\text{log}\)</span> for us) is the inverse of the exponential function <code>exp</code> (<span class="math inline">\(\text{e}\)</span>): <span class="math inline">\(\text{e}^{\text{log}a} = \text{log}(\text{e}^{a})= a\)</span>.</p>
+<p>Our equation is now in the form <span class="math inline">\(y = \alpha + \beta x\)</span>, with <span class="math inline">\(y = \text{log}N\)</span>, <span class="math inline">\(\beta = r\)</span>, <span class="math inline">\(\alpha = \text{log}N_0\)</span>, and <span class="math inline">\(x = t\)</span>. Now we can use <code>lm</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">result &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(Ndata) <span class="op">~</span><span class="st"> </span>times)</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="kw">summary</span>(result)</a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(Ndata) ~ times)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.066072 -0.013871 -0.001559  0.014963  0.079142 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 2.306138   0.008490   271.6   &lt;2e-16 ***
+## times       0.198726   0.001463   135.8   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03076 on 49 degrees of freedom
+## Multiple R-squared:  0.9974, Adjusted R-squared:  0.9973 
+## F-statistic: 1.845e+04 on 1 and 49 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>We can see that the beta coefficient does match the value of <span class="math inline">\(r\)</span> that we started with, but the Intercept value is harder to assess because it’s actually <span class="math inline">\(\text{log}N_0\)</span> instead of just <span class="math inline">\(N_0\)</span>. We can get back <span class="math inline">\(N_0\)</span> using <code>exp</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">N0 &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">coef</span>(result)[<span class="st">&quot;(Intercept)&quot;</span>])</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">r &lt;-<span class="st"> </span><span class="kw">coef</span>(result)[<span class="st">&quot;times&quot;</span>]</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="kw">print</span>(N0)</a></code></pre></div>
+<pre><code>## (Intercept) 
+##    10.03559</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">print</span>(r)</a></code></pre></div>
+<pre><code>##     times 
+## 0.1987257</code></pre>
+<p>And we can use the fit parameters to plot the result.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">qplot</span>(times, Ndata) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> times, </a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">                <span class="dt">y =</span> N0 <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r <span class="op">*</span><span class="st"> </span>times)))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>One advantage to using <code>lm</code> when possible is that it can more easily fit multiple parameters than when you’re fitting by hand. <code>lm</code> also gives you things like confidence intervals, and you can easily apply the model selection techniques outlined last week.</p>
+<p>But be careful when converting a model to a form that can be fit with <code>lm</code>. By applying functional transformations to your model, you are subtly changing its assumptions. For example, we assume when using least squares that the residuals are normally distributed (which they were in our simulated data), however, when taking the logarithm of both sides, the residuals will no longer be normally distributed. We can see this if we add a bit more data to our simulated exponential model.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">20</span>, <span class="dt">by =</span> <span class="fl">0.01</span>) <span class="co"># sample times</span></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">r &lt;-<span class="st"> </span><span class="fl">0.2</span> <span class="co"># growth rate</span></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3">N0 &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># initial population</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co"># use the function &#39;rnorm&#39; to add noise to the data</span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6">Ndata &lt;-<span class="st"> </span>N0<span class="op">*</span><span class="kw">exp</span>(r<span class="op">*</span>times) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="kw">length</span>(times), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">10</span>) </a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8">Ndata[<span class="dv">1</span>] &lt;-<span class="st"> </span>N0 <span class="co"># fix the starting value to be N0 - this means we don&#39;t have to fit the intercept</span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb19-10" data-line-number="10"><span class="kw">qplot</span>(times, Ndata)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># Fit using explicit &#39;brute force&#39; least squares</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co"># Make a range of r parameter values to try</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">r_vals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.01</span>, <span class="fl">0.3</span>, <span class="dt">by =</span> <span class="fl">0.005</span>)</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co"># use the function &#39;sapply&#39; to loop over r_vals list</span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co"># everything inside curly braces is a function that gets executed for each value of r</span></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8">resids_sq &lt;-<span class="st"> </span><span class="kw">sapply</span>(r_vals, <span class="cf">function</span>(r) {</a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">    prediction &lt;-<span class="st"> </span>Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r <span class="op">*</span><span class="st"> </span>times) </a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">    residuals &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>Ndata</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">    <span class="kw">return</span>(<span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb20-12" data-line-number="12">})</a>
+<a class="sourceLine" id="cb20-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb20-14" data-line-number="14">best_fit &lt;-<span class="st"> </span><span class="kw">which</span>(resids_sq <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(resids_sq))</a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">r_fit &lt;-<span class="st"> </span>r_vals[best_fit] </a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># Fit by inverting the equation and using lm</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">result &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(Ndata) <span class="op">~</span><span class="st"> </span>times)</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">N0 &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">coef</span>(result)[<span class="st">&quot;(Intercept)&quot;</span>])</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5">r &lt;-<span class="st"> </span><span class="kw">coef</span>(result)[<span class="st">&quot;times&quot;</span>]</a></code></pre></div>
+<p>Now we can compare the distribution of the residuals in both cases. One of the assumptions of least squares is that the residuals are normally distributed.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">prediction_lm &lt;-<span class="st"> </span><span class="kw">log</span>(N0) <span class="op">+</span><span class="st"> </span>r <span class="op">*</span><span class="st"> </span>times <span class="co"># best fit using lm</span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">prediction_ls &lt;-<span class="st"> </span>Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r_fit <span class="op">*</span><span class="st"> </span>times) <span class="co"># best fit using least squares explicitly</span></a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">resids_lm &lt;-<span class="st"> </span>prediction_lm <span class="op">-</span><span class="st"> </span><span class="kw">log</span>(Ndata)</a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">resids_ls &lt;-<span class="st"> </span>prediction_ls <span class="op">-</span><span class="st"> </span>Ndata</a>
+<a class="sourceLine" id="cb22-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb22-7" data-line-number="7">resids_lm &lt;-<span class="st"> </span>resids_lm[<span class="op">!</span><span class="kw">is.na</span>(resids_lm)]</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="co"># calculate a normal distribution using the standard deviation of each set of residuals</span></a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">x_vec_ls &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">by =</span> <span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">sigma_ls &lt;-<span class="st"> </span><span class="kw">sd</span>(resids_ls)</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4">gaussian_ls &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span>x_vec_ls<span class="op">^</span><span class="dv">2</span><span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>sigma_ls<span class="op">^</span><span class="dv">2</span>))<span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>sigma_ls<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb23-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb23-6" data-line-number="6">x_vec_lm &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb23-7" data-line-number="7">sigma_lm &lt;-<span class="st"> </span><span class="kw">sd</span>(resids_lm)</a>
+<a class="sourceLine" id="cb23-8" data-line-number="8">gaussian_lm &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span>x_vec_lm<span class="op">^</span><span class="dv">2</span><span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>sigma_lm<span class="op">^</span><span class="dv">2</span>))<span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>sigma_lm<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<p>The residuals for the original equation are in fact normally distributed, which is how we set it up in the first place.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">qplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x=</span>resids_ls, <span class="dt">y =</span> ..density..), <span class="dt">binwidth =</span> <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> x_vec_ls, <span class="dt">y =</span> gaussian_ls))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>BUT the residuals for the inverted equation are NOT normally distributed.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">qplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> resids_lm, <span class="dt">y =</span> ..density..), <span class="dt">binwidth =</span> <span class="fl">0.05</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> x_vec_lm, <span class="dt">y =</span> gaussian_lm))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+</div>
+<div id="assumptions-of-least-squares" class="section level3">
+<h3>Assumptions of least squares</h3>
+<p>When is it appropriate to use least squares to fit your data? These assumptions are a recap of the assumptions of linear models section in lecture 8.</p>
+<p><strong>Assumptions of least squares:</strong></p>
+<ul>
+<li>Normality of the residuals: the noise or error is <strong>Gaussian-distributed</strong>, which means that the most likely value for a data point is the predicted value, but there is a Gaussian distribution with some width that determines how likely it is that the data will have a different value.</li>
+<li>Homogeneity of variances at each X: All data points have the same variance in their error; the width of the Gaussian distribution governing the error is the same for each data point. This can be modified though if it’s not a good assumption.</li>
+<li>Fixed X: the noise or error is only in the dependent variable(s), not in the independent variable(s).</li>
+<li>Independence: Each data point is independent of the other data points.</li>
+</ul>
+<p>Now that we’ve fit some simulated data, let’s try it out on real data.</p>
+</div>
+</div>
+<div id="plant-phenology" class="section level2">
+<h2>Plant phenology</h2>
+<p>Today we’ll be working with plant phenology data: <em>phenology</em> is the study of periodic or cyclic natural phenomena, and this dataset contains observations of the seasonal cycles of plants at three NEON sites in the US: Blandy Experimental Farm (<a href="https://www.neonscience.org/field-sites/field-sites-map/BLAN">BLAN</a>) and the Smithsonian Conservation Biology Institute (<a href="https://www.neonscience.org/field-sites/field-sites-map/scbi">SCBI</a>) in Virginia, and the Smithsonian Environmental Research Center (<a href="https://www.neonscience.org/field-sites/field-sites-map/serc">SERC</a>) in Maryland.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="co"># Load the data</span></a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">plant_pheno &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/plant_phenology.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb26-4" data-line-number="4"><span class="kw">glimpse</span>(plant_pheno)</a></code></pre></div>
+<pre><code>## Observations: 12,573
+## Variables: 25
+## $ namedLocation                 &lt;chr&gt; &quot;BLAN_061.phenology.phe&quot;, &quot;BLAN_06…
+## $ siteID                        &lt;chr&gt; &quot;BLAN&quot;, &quot;BLAN&quot;, &quot;BLAN&quot;, &quot;BLAN&quot;, &quot;B…
+## $ plotID                        &lt;chr&gt; &quot;BLAN_061&quot;, &quot;BLAN_061&quot;, &quot;BLAN_061&quot;…
+## $ date                          &lt;date&gt; 2015-06-25, 2015-06-25, 2015-06-2…
+## $ editedDateStat                &lt;date&gt; 2015-07-22, 2015-07-22, 2015-07-2…
+## $ individualID                  &lt;chr&gt; &quot;NEON.PLA.D02.BLAN.06289&quot;, &quot;NEON.P…
+## $ growthForm                    &lt;chr&gt; &quot;Deciduous broadleaf&quot;, &quot;Deciduous …
+## $ phenophaseName                &lt;chr&gt; &quot;Leaves&quot;, &quot;Leaves&quot;, &quot;Leaves&quot;, &quot;Lea…
+## $ phenophaseStatus              &lt;chr&gt; &quot;yes&quot;, &quot;yes&quot;, &quot;yes&quot;, &quot;yes&quot;, &quot;yes&quot;,…
+## $ phenophaseIntensityDefinition &lt;chr&gt; &quot;Percentage of the canopy that is …
+## $ phenophaseIntensity           &lt;chr&gt; &quot;&gt;= 95%&quot;, &quot;&gt;= 95%&quot;, &quot;&gt;= 95%&quot;, &quot;&gt;= …
+## $ remarksStat                   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ decimalLatitude               &lt;dbl&gt; 39.05963, 39.05963, 39.05963, 39.0…
+## $ decimalLongitude              &lt;dbl&gt; -78.07385, -78.07385, -78.07385, -…
+## $ elevation                     &lt;dbl&gt; 183, 183, 183, 183, 183, 183, 183,…
+## $ transectMeter                 &lt;dbl&gt; 497, 469, 491, 484, 504, 506, 498,…
+## $ directionFromTransect         &lt;chr&gt; &quot;Left&quot;, &quot;Left&quot;, &quot;Left&quot;, &quot;Right&quot;, &quot;…
+## $ ninetyDegreeDistance          &lt;dbl&gt; 1.0, 2.0, 0.5, 0.5, 0.5, 1.0, 2.0,…
+## $ sampleGeodeticDatum           &lt;chr&gt; &quot;WGS84&quot;, &quot;WGS84&quot;, &quot;WGS84&quot;, &quot;WGS84&quot;…
+## $ addDate                       &lt;date&gt; 2017-02-24, 2017-02-24, 2016-04-2…
+## $ editedDate                    &lt;date&gt; 2017-03-31, 2017-03-31, 2016-05-0…
+## $ taxonID                       &lt;chr&gt; &quot;RHDA&quot;, &quot;RHDA&quot;, &quot;RHDA&quot;, &quot;RHDA&quot;, &quot;L…
+## $ scientificName                &lt;chr&gt; &quot;Rhamnus davurica Pall.&quot;, &quot;Rhamnus…
+## $ remarks                       &lt;chr&gt; NA, NA, &quot;Nearly dead shaded out&quot;, …
+## $ phenophaseIntensityMean       &lt;dbl&gt; 0.975, 0.975, 0.975, 0.975, 0.975,…</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">View</span>(plant_pheno) <span class="co"># if you want to browse in a spreadsheet-like viewer</span></a></code></pre></div>
+<p>Many of these columns aren’t that relevant for us, but some that we’re definitely interested in are <code>date</code>, <code>phenophaseIntensity</code>, and <code>scientificName</code>. Let’s take a look at what kind of factors we have in the last two columns.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="st">  </span><span class="kw">count</span>(scientificName)</a></code></pre></div>
+<pre><code>## # A tibble: 7 x 2
+##   scientificName                      n
+##   &lt;chr&gt;                           &lt;int&gt;
+## 1 Fagus grandifolia Ehrh.          1478
+## 2 Juglans nigra L.                 2431
+## 3 Lindera benzoin (L.) Blume       1413
+## 4 Liquidambar styraciflua L.        135
+## 5 Liriodendron tulipifera L.       4112
+## 6 Lonicera maackii (Rupr.) Herder  1549
+## 7 Rhamnus davurica Pall.           1455</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="st">  </span><span class="kw">count</span>(phenophaseIntensity)</a></code></pre></div>
+<pre><code>## # A tibble: 7 x 2
+##   phenophaseIntensity     n
+##   &lt;chr&gt;               &lt;int&gt;
+## 1 &lt; 5%                 1318
+## 2 &gt;= 95%               4719
+## 3 25-49%                875
+## 4 5-24%                 935
+## 5 50-74%               1555
+## 6 75-94%               1997
+## 7 &lt;NA&gt;                 1174</code></pre>
+<p>These are 7 species of tree / shrub in this dataset. Feel free to look up what the common names are for each of these; for example, <em>Liriodendron tulipifera</em>, the tulip tree, can be found along the US east coast as well as in Southern Ontario.</p>
+<div class="figure">
+<img src="image/Liriodendron_tulipifera.png" alt="Lipidoptera tulipifera, by Jean-Pol GRANDMONT - Own work, CC BY 3.0, https://commons.wikimedia.org/w/index.php?curid=9873223" />
+<p class="caption">Lipidoptera tulipifera, by Jean-Pol GRANDMONT - Own work, CC BY 3.0, <a href="https://commons.wikimedia.org/w/index.php?curid=9873223" class="uri">https://commons.wikimedia.org/w/index.php?curid=9873223</a></p>
+</div>
+<p>Notice too that the <code>phenophaseIntensity</code> column is a character column, so if we want to use those values as numbers for plotting, we’ll need to convert them to something numeric. I did this manually to create the column <code>phenophaseIntensityMean</code>, which takes the character value in the <code>phenophaseIntensity</code> column and converts it to a number which is the midpoint of that interval.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">str</span>(plant_pheno<span class="op">$</span>phenophaseIntensity)</a></code></pre></div>
+<pre><code>##  chr [1:12573] &quot;&gt;= 95%&quot; &quot;&gt;= 95%&quot; &quot;&gt;= 95%&quot; &quot;&gt;= 95%&quot; &quot;&gt;= 95%&quot; &quot;&gt;= 95%&quot; ...</code></pre>
+<p>I also subsetted the original dataset into just observations of leaf cover percentage for deciduous broadleaf plants.</p>
+<p>Let’s plot the phenophase intensity over time, grouped by the species.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw">ggplot</span>(plant_pheno, </a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">       <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> phenophaseIntensityMean, <span class="dt">color =</span> scientificName)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="st">         </span><span class="kw">geom_point</span>()</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p>The pattern we would expect is already visible in this first plot - the leaves come out in the spring, then disappear again in October. But there might be differences between species and between individuals in a species. One way we could try to assess this is to fit the same model to subgroups of the data and then compare the fitted parameters to see if there are differences.</p>
+</div>
+<div id="fit-an-oscillatory-model-to-the-data" class="section level2">
+<h2>Fit an oscillatory model to the data</h2>
+<p>Let’s try to fit a sine wave to the phenophase intensity. A generic sine wave has four parameters:</p>
+<p><span class="math display">\[y = A \text{sin}(kx - b) + c\]</span> where <span class="math inline">\(k = 2\pi / T\)</span>, <span class="math inline">\(T\)</span> is the period or length of time between peaks, <span class="math inline">\(A\)</span> is the amplitude, <span class="math inline">\(b\)</span> is the phase, and <span class="math inline">\(c\)</span> is the vertical shift or offset.</p>
+<p>Let’s plot a sine wave:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="co"># plot a sine wave</span></a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">3</span>, <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3">A &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb36-4" data-line-number="4">k &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi</a>
+<a class="sourceLine" id="cb36-5" data-line-number="5">b &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb36-6" data-line-number="6">c &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb36-8" data-line-number="8"><span class="kw">qplot</span>(x, A<span class="op">*</span><span class="kw">sin</span>(k<span class="op">*</span>x<span class="op">-</span>b)<span class="op">+</span>c) <span class="op">+</span></a>
+<a class="sourceLine" id="cb36-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_line</span>()</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p>Note that we’re not solving a differential equation to get our model - we’re just assuming some shape for our function. In general you should choose models that make sense and that you have some reason for choosing; this is an example that would probably not be used by true phenologists but will roughly match the pattern in the data. A sine wave is the one of the simplest ways to express an oscillation.</p>
+<p>In order to use the date as a numeric x-axis for fitting purposes, we need to convert it from a <code>date</code> object to a numeric object.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">str</span>(plant_pheno<span class="op">$</span>date)</a></code></pre></div>
+<pre><code>##  Date[1:12573], format: &quot;2015-06-25&quot; &quot;2015-06-25&quot; &quot;2015-06-25&quot; &quot;2015-06-25&quot; &quot;2015-06-25&quot; ...</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># create a list of all the dates in ascending order</span></a>
+<a class="sourceLine" id="cb39-2" data-line-number="2">dates =<span class="st"> </span>plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="st">  </span><span class="kw">arrange</span>(date) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(date)</a>
+<a class="sourceLine" id="cb39-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb39-6" data-line-number="6"><span class="co"># create a function to subtract two dates</span></a>
+<a class="sourceLine" id="cb39-7" data-line-number="7">subtract_dates &lt;-<span class="st"> </span><span class="cf">function</span>(date1, date2) {</a>
+<a class="sourceLine" id="cb39-8" data-line-number="8">  result &lt;-<span class="st"> </span>date1 <span class="op">-</span><span class="st"> </span>date2</a>
+<a class="sourceLine" id="cb39-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb39-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb39-11" data-line-number="11"><span class="co"># create a numeric dates list to use in fitting</span></a>
+<a class="sourceLine" id="cb39-12" data-line-number="12">dates_numeric &lt;-<span class="st"> </span><span class="kw">mapply</span>(subtract_dates,</a>
+<a class="sourceLine" id="cb39-13" data-line-number="13">                 dates<span class="op">$</span>date, <span class="co"># first argument in subtract_dates function </span></a>
+<a class="sourceLine" id="cb39-14" data-line-number="14">                 dates<span class="op">$</span>date[<span class="dv">1</span>]) <span class="co"># second argument in subtract_dates function - the first date</span></a>
+<a class="sourceLine" id="cb39-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb39-16" data-line-number="16"><span class="co"># add numeric dates to the dataframe</span></a>
+<a class="sourceLine" id="cb39-17" data-line-number="17">plant_pheno<span class="op">$</span>date_numeric &lt;-<span class="st"> </span><span class="kw">mapply</span>(subtract_dates, </a>
+<a class="sourceLine" id="cb39-18" data-line-number="18">                                                plant_pheno<span class="op">$</span>date,</a>
+<a class="sourceLine" id="cb39-19" data-line-number="19">                                                dates<span class="op">$</span>date[<span class="dv">1</span>]) <span class="co"># subtract the first date</span></a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co"># drop rows that have NA in phenophaseIntensityMean column</span></a>
+<a class="sourceLine" id="cb40-2" data-line-number="2">plant_pheno &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="st">  </span>plant_pheno[<span class="op">!</span><span class="kw">is.na</span>(plant_pheno<span class="op">$</span>phenophaseIntensityMean),]</a></code></pre></div>
+<p>Let’s fit a particular individual’s phenophase intensity.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="co"># find an individual</span></a>
+<a class="sourceLine" id="cb41-2" data-line-number="2">plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(scientificName <span class="op">==</span><span class="st"> &quot;Liriodendron tulipifera L.&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(scientificName, individualID) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-5" data-line-number="5"><span class="st">  </span><span class="kw">head</span>(<span class="dv">1</span>)</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 2
+##   scientificName             individualID           
+##   &lt;chr&gt;                      &lt;chr&gt;                  
+## 1 Liriodendron tulipifera L. NEON.PLA.D02.SCBI.06071</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="co"># make a data frame with one individual</span></a>
+<a class="sourceLine" id="cb43-2" data-line-number="2">tulip_tree &lt;-<span class="st"> </span>plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(individualID <span class="op">==</span><span class="st"> &quot;NEON.PLA.D02.SCBI.06071&quot;</span>)</a></code></pre></div>
+<p>Now we will create a test sine function to get a rough idea for the parameters. I played around with these numbers ahead of time so that we could know roughly which parameter regime to search.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="co"># period = 365 days</span></a>
+<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="co"># wavenumber of sine function = 2 * pi/period </span></a>
+<a class="sourceLine" id="cb44-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb44-4" data-line-number="4">sine_model &lt;-<span class="st"> </span><span class="cf">function</span>(x, amplitude, period, phase, offset) {</a>
+<a class="sourceLine" id="cb44-5" data-line-number="5">  <span class="kw">return</span>(amplitude<span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span>period<span class="op">*</span>x <span class="op">+</span><span class="st"> </span>phase) <span class="op">+</span><span class="st"> </span>offset)</a>
+<a class="sourceLine" id="cb44-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb44-7" data-line-number="7">A &lt;-<span class="st"> </span><span class="fl">0.5</span> <span class="co"># phenophase intensity values go between 0 and 1</span></a>
+<a class="sourceLine" id="cb44-8" data-line-number="8">offset &lt;-<span class="st"> </span><span class="fl">0.5</span> <span class="co"># add 0.5 to make min 0 and max 1</span></a>
+<a class="sourceLine" id="cb44-9" data-line-number="9">period &lt;-<span class="st"> </span><span class="dv">365</span> <span class="co"># number of days in a year</span></a>
+<a class="sourceLine" id="cb44-10" data-line-number="10">phase &lt;-<span class="st"> </span><span class="fl">0.5</span> <span class="co"># this is a guess</span></a>
+<a class="sourceLine" id="cb44-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb44-12" data-line-number="12">guess_curve &lt;-<span class="st"> </span><span class="kw">sine_model</span>(dates_numeric, A, period, phase, offset)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw">qplot</span>(<span class="dt">x =</span> dates<span class="op">$</span>date, <span class="dt">y =</span> guess_curve) <span class="op">+</span><span class="st"> </span><span class="co"># guess data</span></a>
+<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> tulip_tree,  <span class="co"># actual data</span></a>
+<a class="sourceLine" id="cb45-3" data-line-number="3">       <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> phenophaseIntensityMean, <span class="dt">colour =</span> scientificName)) </a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p>We will only fit <span class="math inline">\(b\)</span>, the horizontal shift, since we already know the other parameters: we know that the minimum and maximum must be 0 and 1 since the intensity goes from 0 to 100%, and this sets both <span class="math inline">\(c\)</span> and <span class="math inline">\(A\)</span>. We also know <span class="math inline">\(k\)</span>, since we know that the oscillation should go around once in a year (365 days). If we were being more fancy, we might want to take into account things like temperature and leap years; there is a <code>pheno</code> package in R specifically for plotting and analyzing phenological data.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="co"># Make a range of b parameter values to try</span></a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">b_vals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>, <span class="dt">by =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb46-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb46-4" data-line-number="4"><span class="co"># use the function &#39;sapply&#39; to loop over b_vals list</span></a>
+<a class="sourceLine" id="cb46-5" data-line-number="5">resids_sq &lt;-<span class="st"> </span><span class="kw">sapply</span>(b_vals, <span class="cf">function</span>(b) {</a>
+<a class="sourceLine" id="cb46-6" data-line-number="6">    prediction &lt;-<span class="st"> </span><span class="fl">0.5</span><span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">365</span><span class="op">*</span>tulip_tree<span class="op">$</span>date_numeric <span class="op">+</span><span class="st"> </span>b) <span class="fl">+0.5</span></a>
+<a class="sourceLine" id="cb46-7" data-line-number="7">    residuals &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>tulip_tree<span class="op">$</span>phenophaseIntensityMean</a>
+<a class="sourceLine" id="cb46-8" data-line-number="8">    <span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb46-9" data-line-number="9">})</a></code></pre></div>
+<p>As before, plotting the sum of the residuals squards vs. the fit parameter will show us if it worked: the best fit is the minimum of the curve.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw">qplot</span>(b_vals, resids_sq)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p>We can see visually that the minimum is around <span class="math inline">\(b = 0.5\)</span>, but to extract that number from the list we can use the function <code>which</code> as before:</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">best_fit &lt;-<span class="st"> </span><span class="kw">which</span>(resids_sq <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(resids_sq))</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">b_fit &lt;-<span class="st"> </span>b_vals[best_fit] </a>
+<a class="sourceLine" id="cb48-3" data-line-number="3">b_fit</a></code></pre></div>
+<pre><code>## [1] 0.53</code></pre>
+<p>Finally, let’s plot the fit against the original data:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> tulip_tree, <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> phenophaseIntensityMean)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb50-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> <span class="fl">0.5</span><span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">365</span><span class="op">*</span>tulip_tree<span class="op">$</span>date_numeric <span class="op">+</span><span class="st"> </span>b_fit) <span class="fl">+0.5</span>, <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p>Not bad! Next, we’ll do this for every single individual in the entire dataset. With fits for each individual, we can look at the distribution of the phase shifts for each species to get a sense of when each species gets its leaves.</p>
+<div id="fit-each-individual-separately" class="section level3">
+<h3>Fit each individual separately</h3>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="co"># Make a range of b parameter values to try</span></a>
+<a class="sourceLine" id="cb51-2" data-line-number="2">b_vals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.01</span>, <span class="fl">1.3</span>, <span class="dt">by =</span> <span class="fl">0.015</span>)</a>
+<a class="sourceLine" id="cb51-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="co"># create a function that does least squares for this model</span></a>
+<a class="sourceLine" id="cb51-5" data-line-number="5">least_squares &lt;-<span class="st"> </span><span class="cf">function</span>(df, b_vals) {</a>
+<a class="sourceLine" id="cb51-6" data-line-number="6">  resids_sq &lt;-<span class="st"> </span><span class="kw">sapply</span>(b_vals, <span class="cf">function</span>(b) {</a>
+<a class="sourceLine" id="cb51-7" data-line-number="7">    prediction &lt;-<span class="st"> </span><span class="fl">0.5</span><span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">365</span><span class="op">*</span>df<span class="op">$</span>date_numeric <span class="op">+</span><span class="st"> </span>b) <span class="fl">+0.5</span></a>
+<a class="sourceLine" id="cb51-8" data-line-number="8">    residuals &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>df<span class="op">$</span>phenophaseIntensityMean</a>
+<a class="sourceLine" id="cb51-9" data-line-number="9">    <span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb51-10" data-line-number="10">    })</a>
+<a class="sourceLine" id="cb51-11" data-line-number="11">  <span class="kw">return</span>(<span class="kw">data.frame</span>(b_vals, resids_sq))</a>
+<a class="sourceLine" id="cb51-12" data-line-number="12">}</a>
+<a class="sourceLine" id="cb51-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb51-14" data-line-number="14"><span class="co"># create a data frame that contains the residuals grouped by species</span></a>
+<a class="sourceLine" id="cb51-15" data-line-number="15">resids_sq_individuals &lt;-<span class="st"> </span>plant_pheno <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb51-16" data-line-number="16"><span class="st">  </span><span class="kw">group_by</span>(individualID, scientificName) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb51-17" data-line-number="17"><span class="st">  </span><span class="kw">do</span>(<span class="kw">data.frame</span>(<span class="dt">val=</span><span class="kw">least_squares</span>(., b_vals)))</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw">ggplot</span>(resids_sq_individuals, <span class="kw">aes</span>(<span class="dt">x=</span>val.b_vals, <span class="dt">y =</span> val.resids_sq, <span class="dt">colour =</span> scientificName)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>()</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-38-1.png" width="672" /> Get the best fit <span class="math inline">\(b\)</span> value for each individual:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="co"># store the best fit values in a new data frame</span></a>
+<a class="sourceLine" id="cb53-2" data-line-number="2">b_df_all &lt;-<span class="st"> </span>resids_sq_individuals <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(individualID, scientificName) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">phase =</span> b_vals[<span class="kw">which</span>(val.resids_sq<span class="op">==</span><span class="st"> </span><span class="kw">min</span>(val.resids_sq))])</a>
+<a class="sourceLine" id="cb53-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb53-6" data-line-number="6"><span class="kw">head</span>(b_df_all)</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 3
+## # Groups:   individualID [6]
+##   individualID            scientificName                  phase
+##   &lt;chr&gt;                   &lt;chr&gt;                           &lt;dbl&gt;
+## 1 NEON.PLA.D02.BLAN.06201 Lonicera maackii (Rupr.) Herder 0.655
+## 2 NEON.PLA.D02.BLAN.06202 Rhamnus davurica Pall.          0.565
+## 3 NEON.PLA.D02.BLAN.06203 Lonicera maackii (Rupr.) Herder 0.64 
+## 4 NEON.PLA.D02.BLAN.06204 Rhamnus davurica Pall.          0.565
+## 5 NEON.PLA.D02.BLAN.06205 Lonicera maackii (Rupr.) Herder 0.685
+## 6 NEON.PLA.D02.BLAN.06206 Rhamnus davurica Pall.          0.595</code></pre>
+<p>We have best fit values for the phase for every individual plant in our dataset. To visualize this, we will make a violin plot of the phases, grouped by species.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="co"># violin plot</span></a>
+<a class="sourceLine" id="cb55-2" data-line-number="2"><span class="kw">ggplot</span>(b_df_all, <span class="kw">aes</span>(<span class="dt">x =</span> scientificName, <span class="dt">y =</span> phase, <span class="dt">colour =</span> scientificName)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_violin</span>(<span class="dt">scale =</span> <span class="st">&#39;count&#39;</span>, <span class="dt">draw_quantiles =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">height =</span> <span class="dv">0</span>, <span class="dt">width =</span> <span class="fl">0.1</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-5" data-line-number="5"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.title.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb55-6" data-line-number="6">        <span class="dt">axis.text.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb55-7" data-line-number="7">        <span class="dt">axis.ticks.x=</span><span class="kw">element_blank</span>())</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p>The phase <span class="math inline">\(b\)</span> is a positive number for each of these, and in our model we fit the curve like this:</p>
+<p><span class="math display">\[y = A\text{sin}(kx + b) + c\]</span> A positive <span class="math inline">\(b\)</span> shifts the curve to the left, so our model suggests that species with larger <span class="math inline">\(b\)</span> either get their leaves earlier, lose their leaves earlier, or peak earlier, or some combination of all three. I’m not a phenologist, but we can do some reading to see if the general pattern we observe is really there: <em>Lonicera maackii</em>, Amur honeysuckle (an invasive species), does in fact leaf out very early in the spring and keeps its leaves longer than other plants, according to <a href="http://www.bioone.org/doi/abs/10.3159/08-RA-109.1">this paper</a> by McEwan et al. (2009).</p>
+<p>This actually suggests a limitation to our approach: by fitting the same period of sine curve to each dataset, we have no information on how long the leaf season is for each plant: we have no way of distinguishing a plant that leafs earlier and loses its leaves earlier from a plant that peaks earlier and keeps its leaves longer. It’s hard to interpret what <span class="math inline">\(b\)</span> actually means in terms of the phenophase. Let’s plot the smallest and largest <span class="math inline">\(b\)</span> species together:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1">plant_pheno <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb56-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(taxonID <span class="op">==</span><span class="st"> &quot;LOMA6&quot;</span> <span class="op">|</span><span class="st"> </span>taxonID <span class="op">==</span><span class="st"> &quot;JUNI&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># easier than typing the full scientific name</span></a>
+<a class="sourceLine" id="cb56-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y =</span> phenophaseIntensityMean, <span class="dt">colour =</span> scientificName)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>()</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p>By examining these two species side by side, we can see that <em>Lonicera maackii</em> peaks at about the same time as <em>Juglans nigra</em>, but it gets leaves earlier and keeps its leaves later. To actually distinguish each of these events, we would need a more complicated model with more fit parameters.</p>
+</div>
+</div>
+<div id="extras" class="section level2">
+<h2>Extras</h2>
+<div id="fitting-models-with-two-or-more-parameters" class="section level3">
+<h3>Fitting models with two or more parameters</h3>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="co"># https://uoftcoders.github.io/rcourse/data/plant-biomass-preprocess.csv</span></a>
+<a class="sourceLine" id="cb57-2" data-line-number="2">plant_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;plant-biomass-preprocess.csv&quot;</span>)</a></code></pre></div>
+<p>We can use our usual tricks to see what’s in our dataset:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">summary</span>(plant_data) <span class="co"># create a summary of the dataset</span></a>
+<a class="sourceLine" id="cb58-2" data-line-number="2"><span class="kw">head</span>(plant_data) <span class="co"># display the first few rows of the data</span></a>
+<a class="sourceLine" id="cb58-3" data-line-number="3"><span class="kw">colnames</span>(plant_data) <span class="co"># show the column names</span></a></code></pre></div>
+<p>Let’s plot just one of the habitats, sites, and treatments vs. time and colour by species.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb59-2" data-line-number="2"><span class="kw">library</span>(tidyr)</a>
+<a class="sourceLine" id="cb59-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb59-4" data-line-number="4">plant_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-5" data-line-number="5"><span class="st">  </span><span class="kw">filter</span>(habitat <span class="op">==</span><span class="st"> &quot;Tundra&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb59-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(site <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-7" data-line-number="7"><span class="st">  </span><span class="kw">filter</span>(treatment <span class="op">==</span><span class="st"> &quot;rodentexclosure&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-8" data-line-number="8"><span class="st">  </span><span class="kw">gather</span>(Species, Value, <span class="op">-</span>year, <span class="op">-</span>treatment, <span class="op">-</span>habitat, <span class="op">-</span>site) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-9" data-line-number="9"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb59-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> Value, <span class="dt">color =</span> Species))</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<p><em>Empetrum nigrum</em> looks like it could be following logistic growth, so let’s try to fit the data to that model. First, let’s make a new variable with just the data we want to fit.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1">e_nigrum &lt;-<span class="st"> </span>plant_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb60-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(site <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb60-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(habitat <span class="op">==</span><span class="st"> &quot;Tundra&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb60-4" data-line-number="4"><span class="st">  </span><span class="kw">filter</span>(treatment <span class="op">==</span><span class="st"> &quot;rodentexclosure&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb60-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(year, empetrum_nigrum) </a></code></pre></div>
+<p>Now we define a logistic model function so that we can numerically generate the model’s solution and compare it to the data.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">logistic_fn &lt;-<span class="st"> </span><span class="cf">function</span>(t, state, parameters) {</a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">  <span class="co"># Calculates dN/dt for the logistic equation</span></a>
+<a class="sourceLine" id="cb61-3" data-line-number="3">  </a>
+<a class="sourceLine" id="cb61-4" data-line-number="4">  <span class="co"># t: time point at which to evaluate derivative (doesn&#39;t actually change anything in this example)</span></a>
+<a class="sourceLine" id="cb61-5" data-line-number="5">  <span class="co"># state: vector of variables (here it&#39;s just N)</span></a>
+<a class="sourceLine" id="cb61-6" data-line-number="6">  <span class="co"># parameters: vector of model parameters c(r, K)</span></a>
+<a class="sourceLine" id="cb61-7" data-line-number="7">  </a>
+<a class="sourceLine" id="cb61-8" data-line-number="8">  N &lt;-<span class="st"> </span>state </a>
+<a class="sourceLine" id="cb61-9" data-line-number="9">  </a>
+<a class="sourceLine" id="cb61-10" data-line-number="10">  r &lt;-<span class="st"> </span>parameters[<span class="dv">1</span>] <span class="co"># the first element of the parameters vector is r</span></a>
+<a class="sourceLine" id="cb61-11" data-line-number="11">  K &lt;-<span class="st"> </span>parameters[<span class="dv">2</span>] <span class="co"># the second element of the parameters vector is K</span></a>
+<a class="sourceLine" id="cb61-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb61-13" data-line-number="13">  <span class="co">#rate of change</span></a>
+<a class="sourceLine" id="cb61-14" data-line-number="14">  dN &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span>N <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>N <span class="op">/</span><span class="st"> </span>K)</a>
+<a class="sourceLine" id="cb61-15" data-line-number="15">    </a>
+<a class="sourceLine" id="cb61-16" data-line-number="16">  <span class="co">#return rate of change</span></a>
+<a class="sourceLine" id="cb61-17" data-line-number="17">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="kw">c</span>(dN)))</a>
+<a class="sourceLine" id="cb61-18" data-line-number="18">}</a></code></pre></div>
+<p>Let’s try running a single numerical solution and plotting it alongside the data.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="kw">library</span>(deSolve)</a>
+<a class="sourceLine" id="cb62-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb62-3" data-line-number="3">parameters &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">r =</span> <span class="fl">0.5</span>, <span class="dt">K =</span> <span class="dv">150</span>)</a>
+<a class="sourceLine" id="cb62-4" data-line-number="4">state &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">N =</span> e_nigrum[<span class="dv">1</span>,<span class="dv">2</span>]) <span class="co"># the first row and second column is the initial population size</span></a>
+<a class="sourceLine" id="cb62-5" data-line-number="5">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">14</span>, <span class="dt">by =</span> <span class="dv">1</span>) <span class="co"># make the same time vector as the data</span></a>
+<a class="sourceLine" id="cb62-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb62-7" data-line-number="7">result &lt;-</a>
+<a class="sourceLine" id="cb62-8" data-line-number="8"><span class="st">  </span><span class="kw">ode</span>(</a>
+<a class="sourceLine" id="cb62-9" data-line-number="9">  <span class="dt">y =</span> state,</a>
+<a class="sourceLine" id="cb62-10" data-line-number="10">  <span class="dt">times =</span> times,</a>
+<a class="sourceLine" id="cb62-11" data-line-number="11">  <span class="dt">func =</span> logistic_fn,</a>
+<a class="sourceLine" id="cb62-12" data-line-number="12">  <span class="dt">parms =</span> parameters</a>
+<a class="sourceLine" id="cb62-13" data-line-number="13">  )</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># Plot</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">result &lt;-<span class="st"> </span><span class="kw">data.frame</span>(result)</a>
+<a class="sourceLine" id="cb63-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb63-4" data-line-number="4">p1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(e_nigrum) <span class="op">+</span></a>
+<a class="sourceLine" id="cb63-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> empetrum_nigrum))</a>
+<a class="sourceLine" id="cb63-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb63-7" data-line-number="7">p1 <span class="op">+</span></a>
+<a class="sourceLine" id="cb63-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time <span class="op">+</span><span class="st"> </span><span class="dv">1998</span>, <span class="dt">y =</span> N), result, <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb63-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time <span class="op">+</span><span class="st"> </span><span class="dv">1998</span>, <span class="dt">y =</span> N), result, <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span>)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<p>Now we’ll define a grid of <span class="math inline">\(r\)</span> and <span class="math inline">\(K\)</span> values to try, then calculate a numerical solution for each combination of parameters. Here we’re combining solving the differential equation and least squres in one fell swoop: for each combination of parameters, we use <code>ode</code> to generate a numerical solution, then calculate the residuals and the fit.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">logistic_pred_fn &lt;-<span class="st"> </span><span class="cf">function</span>(r, K) {</a>
+<a class="sourceLine" id="cb64-2" data-line-number="2">    result &lt;-<span class="st"> </span><span class="kw">ode</span>(<span class="dt">y =</span> state, </a>
+<a class="sourceLine" id="cb64-3" data-line-number="3">                  <span class="dt">times =</span> times, </a>
+<a class="sourceLine" id="cb64-4" data-line-number="4">                  <span class="dt">func =</span> logistic_fn,</a>
+<a class="sourceLine" id="cb64-5" data-line-number="5">                  <span class="dt">parms =</span> <span class="kw">c</span>(<span class="dt">r =</span> r, <span class="dt">K =</span> K))</a>
+<a class="sourceLine" id="cb64-6" data-line-number="6">    result &lt;-<span class="st"> </span><span class="kw">data.frame</span>(result)</a>
+<a class="sourceLine" id="cb64-7" data-line-number="7">    residuals &lt;-<span class="st"> </span>result<span class="op">$</span>N <span class="op">-</span><span class="st"> </span>e_nigrum<span class="op">$</span>empetrum_nigrum</a>
+<a class="sourceLine" id="cb64-8" data-line-number="8">    <span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb64-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb64-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb64-11" data-line-number="11">rvals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.05</span>, <span class="fl">1.0</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb64-12" data-line-number="12">Kvals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">120</span>, <span class="dv">180</span>, <span class="dt">by =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb64-13" data-line-number="13"><span class="co"># Create a two column data frame with every combination of rvals and Kvals</span></a>
+<a class="sourceLine" id="cb64-14" data-line-number="14">params &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">r =</span> rvals, <span class="dt">K =</span> Kvals)</a>
+<a class="sourceLine" id="cb64-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb64-16" data-line-number="16"><span class="co"># Apply the logistic_pred_fn to each combination of rvals and Kvals.</span></a>
+<a class="sourceLine" id="cb64-17" data-line-number="17"><span class="co"># This is known as vectorization, which is R&#39;s strength.</span></a>
+<a class="sourceLine" id="cb64-18" data-line-number="18">resids &lt;-<span class="st"> </span><span class="kw">mapply</span>(logistic_pred_fn,</a>
+<a class="sourceLine" id="cb64-19" data-line-number="19">                 params<span class="op">$</span>r, <span class="co"># First arg in logistic_pred_fn</span></a>
+<a class="sourceLine" id="cb64-20" data-line-number="20">                 params<span class="op">$</span>K) <span class="co"># Second arg in logistic_pred_fn</span></a>
+<a class="sourceLine" id="cb64-21" data-line-number="21">resids &lt;-<span class="st"> </span><span class="kw">matrix</span>(resids, <span class="dt">nrow =</span> <span class="kw">length</span>(rvals), <span class="dt">ncol =</span> <span class="kw">length</span>(Kvals))</a></code></pre></div>
+<p>We can use the library <code>lattice</code> to plot the surface of sums of residuals squared:</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="kw">library</span>(lattice)</a>
+<a class="sourceLine" id="cb65-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb65-3" data-line-number="3"><span class="kw">wireframe</span>(</a>
+<a class="sourceLine" id="cb65-4" data-line-number="4">  resids,</a>
+<a class="sourceLine" id="cb65-5" data-line-number="5">  <span class="dt">shade =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb65-6" data-line-number="6">  <span class="dt">xlab =</span> <span class="st">&quot;R&quot;</span>,</a>
+<a class="sourceLine" id="cb65-7" data-line-number="7">  <span class="dt">ylab =</span> <span class="st">&quot;K&quot;</span>,</a>
+<a class="sourceLine" id="cb65-8" data-line-number="8">  <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">arrows =</span> <span class="ot">FALSE</span>) <span class="co"># fix so that axes are correct numbers</span></a>
+<a class="sourceLine" id="cb65-9" data-line-number="9">  ) </a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p>Now we extract the values of <span class="math inline">\(r\)</span> and <span class="math inline">\(K\)</span> that minimize the sum of residuals squared:</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1">best_fit &lt;-<span class="st"> </span><span class="kw">which</span>(resids <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(resids), <span class="dt">arr.ind =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb66-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb66-3" data-line-number="3">r_fit &lt;-<span class="st"> </span>rvals[best_fit[<span class="dv">1</span>]] <span class="co"># r is varied across the rows of the surface</span></a>
+<a class="sourceLine" id="cb66-4" data-line-number="4">K_fit &lt;-<span class="st"> </span>Kvals[best_fit[<span class="dv">2</span>]] <span class="co"># K is varied across the columns of the surface</span></a></code></pre></div>
+<p>And now we can plot the best fit curve with the data:</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1">result &lt;-</a>
+<a class="sourceLine" id="cb67-2" data-line-number="2"><span class="st">  </span><span class="kw">ode</span>(</a>
+<a class="sourceLine" id="cb67-3" data-line-number="3">  <span class="dt">y =</span> state,</a>
+<a class="sourceLine" id="cb67-4" data-line-number="4">  <span class="dt">times =</span> times,</a>
+<a class="sourceLine" id="cb67-5" data-line-number="5">  <span class="dt">func =</span> logistic_fn,</a>
+<a class="sourceLine" id="cb67-6" data-line-number="6">  <span class="dt">parms =</span> <span class="kw">c</span>(<span class="dt">r =</span> r_fit, <span class="dt">K =</span> K_fit)</a>
+<a class="sourceLine" id="cb67-7" data-line-number="7">  )</a>
+<a class="sourceLine" id="cb67-8" data-line-number="8">  </a>
+<a class="sourceLine" id="cb67-9" data-line-number="9">result &lt;-<span class="st"> </span><span class="kw">data.frame</span>(result)</a>
+<a class="sourceLine" id="cb67-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb67-11" data-line-number="11">p2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(e_nigrum) <span class="op">+</span></a>
+<a class="sourceLine" id="cb67-12" data-line-number="12"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> empetrum_nigrum))</a>
+<a class="sourceLine" id="cb67-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb67-14" data-line-number="14">p2 <span class="op">+</span></a>
+<a class="sourceLine" id="cb67-15" data-line-number="15"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time <span class="op">+</span><span class="st"> </span><span class="dv">1998</span>, <span class="dt">y =</span> N), result, <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb67-16" data-line-number="16"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time <span class="op">+</span><span class="st"> </span><span class="dv">1998</span>, <span class="dt">y =</span> N), result, <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span>)</a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<p>You can do this process with more than two parameters as well, but the search space will be larger and the simulations necessary will take longer.</p>
+</div>
+<div id="maximum-likelihood" class="section level3">
+<h3>Maximum Likelihood</h3>
+<p>Maximum likelihood is a way of finding parameters of a given probability distribution that best match data. It answers the question: which paremeter(s) make the data most likely to have occured?</p>
+<p>Likelihood is defined as <span class="math inline">\(P(\text{data} | \text{model})\)</span>, which you can read as <em>the probability of the data given the model</em>. This is subtly different from <span class="math inline">\(P(\text{model} | \text{data})\)</span>, the probability of the model given the data, which is what you’re really after. But according to Bayes’ theorem, these two quantities are proportional, and so in practice, maximizing the likelihood is equivalent to maximizing the probability of a particular model given your data.</p>
+<p>Bayes’ theorem, for the curious:</p>
+<p><span class="math display">\[ P(A | B) = \frac{P(B | A)P(A)}{P(B)}\]</span></p>
+<div id="least-squares-from-maximum-likelihood" class="section level4">
+<h4>Least squares from maximum likelihood</h4>
+<p>Least squares is the maximum likelihood solution for the assumption that errors are Gaussian distributed. This assumption can be formulated like this: for a set of data <span class="math inline">\(y\)</span> as a function of <span class="math inline">\(x\)</span>, let <span class="math inline">\(e_i\)</span> be the difference between the predicted and measured value of <span class="math inline">\(y\)</span> at point <span class="math inline">\(x_i\)</span>. We assume <span class="math inline">\(e_i\)</span> follows a <strong>Gaussian</strong> or <strong>normal</strong> distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma^2\)</span>:</p>
+<p><span class="math display">\[P(e_i) = \frac{1}{\sqrt{2 \pi \sigma^2}} \text{e}^{-\frac{e_i^2}{2\sigma^2}}\]</span></p>
+<p>We also assume that each data point <span class="math inline">\(y_i\)</span> is independent, so the probability for the entire dataset is a product of all the probabilities for each data point:</p>
+<p><span class="math display">\[P(\vec{e}) = P(e_1)P(e_2) ... P(e_N) = \prod_{i=1}^N P(e_i) \]</span></p>
+<p>This is the <strong>likelihood</strong>, this is the quantity we want to maximize. To make our lives easier, we can also maximize the logarithm of the likelihood instead, since the logarithm is an increasing function and its maximum will still be in the same spot.</p>
+<p>The log-likelihood is</p>
+<p><span class="math display">\[\sum_{i=1}^N \text{log}P(e_i) = \sum_{i=1}^N \left( \text{log} \frac{1}{\sqrt{2 \pi \sigma^2}} - \frac{e_i^2}{2\sigma^2} \right)\]</span></p>
+<p><span class="math display">\[ = N \text{log} \frac{1}{\sqrt{2 \pi \sigma^2}} - \frac{1}{2\sigma^2}\sum_{i=1}^N e_i^2\]</span></p>
+<p>The first term is a constant, and so we can forget about it when looking for the maximum. What we’re left with is wanting to maximize</p>
+<p><span class="math display">\[- \frac{1}{2\sigma^2}\sum_{i=1}^N e_i^2\]</span></p>
+<p>Since <span class="math inline">\(\sigma\)</span> is a constant, we can drop the prefactor as well. Finally, we can change the sign and <em>minimize</em> what’s left:</p>
+<p><span class="math display">\[\sum_{i=1}^N e_i^2\]</span></p>
+<p>But remember that <span class="math inline">\(e_i\)</span> is just the difference between the predicted <span class="math inline">\(y_i\)</span> and the actual data point <span class="math inline">\(y_i\)</span>, so the quantity above is just the sum of the squares of the residuals, exactly what we want to minimize in least squares.</p>
+</div>
+<div id="calculating-aic-directly" class="section level4">
+<h4>Calculating AIC directly</h4>
+<p>For a set of data <span class="math inline">\(y\)</span> as a function of <span class="math inline">\(x\)</span>, let <span class="math inline">\(e_i\)</span> be the difference between the predicted and measured value of <span class="math inline">\(y\)</span> at point <span class="math inline">\(x_i\)</span>. We assume <span class="math inline">\(e_i\)</span> follows a <strong>Gaussian</strong> or <strong>normal</strong> distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma\)</span>: The log-likelihood is:</p>
+<p><span class="math display">\[ = N \text{log} \frac{1}{\sqrt{2 \pi \sigma^2}} - \frac{1}{2\sigma^2}\sum_{i=1}^N e_i^2\]</span></p>
+<p>Generate some data:</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" data-line-number="1">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">by =</span> <span class="fl">0.2</span>) <span class="co"># sample times</span></a>
+<a class="sourceLine" id="cb68-2" data-line-number="2">r &lt;-<span class="st"> </span><span class="fl">0.2</span> <span class="co"># growth rate</span></a>
+<a class="sourceLine" id="cb68-3" data-line-number="3">N0 &lt;-<span class="st"> </span><span class="dv">10</span> <span class="co"># initial population</span></a>
+<a class="sourceLine" id="cb68-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb68-5" data-line-number="5"><span class="co"># use the function &#39;rnorm&#39; to add noise to the data</span></a>
+<a class="sourceLine" id="cb68-6" data-line-number="6">Ndata &lt;-<span class="st"> </span>N0<span class="op">*</span><span class="kw">exp</span>(r<span class="op">*</span>times) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="kw">length</span>(times), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.75</span>) </a>
+<a class="sourceLine" id="cb68-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb68-8" data-line-number="8">Ndata[<span class="dv">1</span>] &lt;-<span class="st"> </span>N0 <span class="co"># fix the starting value to be N0 - this means we don&#39;t have to fit the intercept</span></a>
+<a class="sourceLine" id="cb68-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb68-10" data-line-number="10"><span class="kw">qplot</span>(times,Ndata) <span class="co"># check with a plot</span></a></code></pre></div>
+<p><img src="lec13-time-series_files/figure-html/unnamed-chunk-54-1.png" width="672" /> Fit the data to our model using least squares:</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="co"># Make a range of r parameter values to try</span></a>
+<a class="sourceLine" id="cb69-2" data-line-number="2">r_vals &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.01</span>, <span class="fl">0.3</span>, <span class="dt">by =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb69-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb69-4" data-line-number="4"><span class="co"># use the function &#39;sapply&#39; to loop over r_vals list</span></a>
+<a class="sourceLine" id="cb69-5" data-line-number="5"><span class="co"># everything inside curly braces is a function that gets executed for each value of r</span></a>
+<a class="sourceLine" id="cb69-6" data-line-number="6">resids_sq &lt;-<span class="st"> </span><span class="kw">sapply</span>(r_vals, <span class="cf">function</span>(r) {</a>
+<a class="sourceLine" id="cb69-7" data-line-number="7">    prediction &lt;-<span class="st"> </span>Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r <span class="op">*</span><span class="st"> </span>times) <span class="co"># we&#39;re not fitting N0, just assuming it&#39;s the first data point</span></a>
+<a class="sourceLine" id="cb69-8" data-line-number="8">    residuals &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>Ndata</a>
+<a class="sourceLine" id="cb69-9" data-line-number="9">    <span class="kw">return</span>(<span class="kw">sum</span>(residuals<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb69-10" data-line-number="10">})</a>
+<a class="sourceLine" id="cb69-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb69-12" data-line-number="12">best_fit &lt;-<span class="st"> </span><span class="kw">which</span>(resids_sq <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(resids_sq))</a>
+<a class="sourceLine" id="cb69-13" data-line-number="13">r_fit &lt;-<span class="st"> </span>r_vals[best_fit] </a></code></pre></div>
+<p>The formula for AIC is</p>
+<p><span class="math display">\[\text{AIC} = -2\text{log} \mathcal{L} + 2p\]</span></p>
+<p>Calculate the log-likelihood and AIC:</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1">prediction &lt;-<span class="st"> </span>Ndata[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(r_fit <span class="op">*</span><span class="st"> </span>times) <span class="co"># predicted fit</span></a>
+<a class="sourceLine" id="cb70-2" data-line-number="2">e_vec &lt;-<span class="st"> </span>prediction <span class="op">-</span><span class="st"> </span>Ndata <span class="co"># vector of residuals</span></a>
+<a class="sourceLine" id="cb70-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb70-4" data-line-number="4">N &lt;-<span class="st"> </span><span class="kw">length</span>(Ndata) <span class="co"># number of data points</span></a>
+<a class="sourceLine" id="cb70-5" data-line-number="5">sigma &lt;-<span class="st"> </span><span class="kw">sd</span>(e_vec) <span class="co"># standard deviation of residuals</span></a>
+<a class="sourceLine" id="cb70-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb70-7" data-line-number="7">log_likelihood &lt;-<span class="st"> </span>N<span class="op">*</span><span class="kw">log</span>(<span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>sigma<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>sigma<span class="op">^</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span><span class="kw">sum</span>(e_vec<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb70-8" data-line-number="8">log_likelihood</a></code></pre></div>
+<pre><code>## [1] -49.47769</code></pre>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="co"># calculate AIC</span></a>
+<a class="sourceLine" id="cb72-2" data-line-number="2">aic &lt;-<span class="st"> </span><span class="dv">-2</span><span class="op">*</span>log_likelihood <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="dv">2</span> <span class="co"># 2 degrees of freedom</span></a>
+<a class="sourceLine" id="cb72-3" data-line-number="3">aic</a></code></pre></div>
+<pre><code>## [1] 102.9554</code></pre>
+<p>Be careful though: this AIC value will not necessarily be the same as what you get from <code>lm</code> or <code>glm</code>: it could be because you’ve transformed your data and so the maximum likelihood solution is not the same, or that <code>lm</code> or <code>glm</code> uses another method with a different likelihood. Either way, it’s important to know the assumptions that go into it when you’re comparing models.</p>
+</div>
+</div>
+</div>
+
+
+<hr>
+
+<p>This work is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>. See the <a href="LICENSE.html">licensing</a> page for more details about copyright information.</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

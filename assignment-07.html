@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Assignment 7</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link rel="icon" type="image/png" href="image/favicon.png">
+<style type="text/css">
+
+table {
+    border-collapse: collapse;
+}
+
+thead {
+    border-top: solid #DCDCDC;
+    border-bottom: solid #DCDCDC;
+}
+
+tr.odd {
+    background-color: #F8F8F8;
+}
+
+tr:last-child {
+    border-bottom: solid #DCDCDC;
+}
+
+</style>
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 54px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h2 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h3 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h4 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h5 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h6 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EEB313H1</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-map-o"></span>
+     
+    Syllabus
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Lectures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="lec01-introduction.html">Sept. 10: Intro to course, programming, RStudio, and R Markdown</a>
+    </li>
+    <li>
+      <a href="lec02-basic-r.html">Sept. 12: Assignment, vectors, functions</a>
+    </li>
+    <li>
+      <a href="lec03-basic-r.html">Sept. 17: Data frames, intro to dplyr</a>
+    </li>
+    <li>
+      <a href="lec04-dplyr.html">Sept. 19: Data wrangling in dplyr, ggplot, tidy data</a>
+    </li>
+    <li>
+      <a href="lec05-dplyr.html">Sept. 24: More dplyr and ggplot</a>
+    </li>
+    <li class="dropdown-header">Sept. 26: Exploratory data analysis</li>
+    <li class="dropdown-header">Oct. 01: Linear models and statistical modelling</li>
+    <li class="dropdown-header">Oct. 03: Mixed effects models</li>
+    <li class="dropdown-header">Oct. 08: Simulating data: Randomization tests</li>
+    <li class="dropdown-header">Oct. 10: Multivariate stats</li>
+    <li class="dropdown-header">Oct. 15: Model selection</li>
+    <li class="dropdown-header">Oct. 17: Numerically solving population models</li>
+    <li class="dropdown-header">Oct. 22: Time series analysis</li>
+    <li class="dropdown-header">Oct. 24: Datasets, hypothesis, begin projects</li>
+    <li class="dropdown-header">Oct. 29: Reproducible science</li>
+    <li class="dropdown-header">Oct. 31: Reproducible science</li>
+    <li class="dropdown-header">Nov. 12: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 14: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 19: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 21: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 26: Project work (no lesson)</li>
+    <li class="dropdown-header">Nov. 28: Project work (no lesson)</li>
+    <li class="dropdown-header">Dec. 03: Project work (no lesson)</li>
+    <li class="dropdown-header">Dec. 05: Group presentations (no lesson)</li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Assignments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Assignment 1</li>
+    <li class="dropdown-header">Assignment 2</li>
+    <li class="dropdown-header">Assignment 3</li>
+    <li class="dropdown-header">Assignment 4</li>
+    <li class="dropdown-header">Assignment 5</li>
+    <li class="dropdown-header">Assignment 6</li>
+    <li class="dropdown-header">Assignment 7</li>
+    <li class="dropdown-header">Assignment 8</li>
+    <li class="dropdown-header">Final project</li>
+  </ul>
+</li>
+<li>
+  <a href="resources.html">
+    <span class="fa fa-question"></span>
+     
+    Resources and FAQ
+  </a>
+</li>
+<li>
+  <a href="about.html">
+    <span class="fa fa-info"></span>
+     
+    About
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-bars"></span>
+     
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="mailto:ahmed.hasan@mail.utoronto.ca">
+        <span class="fa fa-envelope"></span>
+         
+        Contact
+      </a>
+    </li>
+    <li>
+      <a href="https://github.com/uoftcoders/rcourse">
+        <span class="fa fa-github"></span>
+         
+        GitHub
+      </a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Assignment 7</h1>
+
+</div>
+
+
+<p><em>To submit this assignment, upload the full document on Quercus, including the original questions, your code, and the output. Submit your assignment as a knitted <code>.pdf</code> or <code>.html</code> file.</em></p>
+<p><em>For questions that ask you to plot something by hand, indicate which assignment and question the plot is for and either include a photo or scan of it in the markdown document, create the plot digitally, or hand in the hard copy.</em></p>
+<ol style="list-style-type: decimal">
+<li><p>Qualitatively analyzing a one-dimensional model (2 marks)</p>
+<p>Consider the differential equation <span class="math inline">\(\frac{dx}{dt} = x(1-x)\)</span>.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Use R to plot <span class="math inline">\(\frac{dx}{dt}\)</span> vs. <span class="math inline">\(x\)</span> for <span class="math inline">\(-1 \le x \le 2\)</span>. (0.5 marks)</p></li>
+<li><p>Sketch a one-dimensional phase portrait on paper (or digitally if you prefer). Mark the direction of the derivative in each region with arrows and label the fixed points as “stable” or “unstable”. (0.5 marks)</p></li>
+<li><p>Use R to numerically solve this equation and plot <span class="math inline">\(x\)</span> vs. <span class="math inline">\(t\)</span> for <span class="math inline">\(0 \le t \le 10\)</span>. Plot trajectories for several different starting values of <span class="math inline">\(x\)</span> (initial conditions) using <code>ggplot</code> and the <code>do</code> function we used in class. Based on the long-time behaviour of the system, which fixed point(s) are stable and which are unstable? (1 mark)</p></li>
+</ol></li>
+<li><p>The Allee Effect (3 marks)</p>
+<p>Generally, as population size increases, a population will experience a decreased growth rate due to greater competition for resources. This is a negative density-dependent growth rate, and one example of this is the logistic model.</p>
+<p>The Allee effect introduces positive density dependence, where increases in population size result in increased growth rates over a certain range of population sizes. One way to incorporate the Allee effect into the logistic growth equation is as follows:</p>
+<p><span class="math display">\[\frac{dN}{dt} = rN\left(1-\frac{N}{K}\right)\left(\frac{N-A}{K}\right)\]</span></p>
+<p>Here <span class="math inline">\(r\)</span> represents the growth rate of the population, <span class="math inline">\(K\)</span> is the carrying capacity, and <span class="math inline">\(A\)</span> is the critical population size above which the total growth rate is positive.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Take <span class="math inline">\(r=1\)</span>, <span class="math inline">\(A=10\)</span>, and <span class="math inline">\(K=50\)</span>. Use R to plot <span class="math inline">\(\frac{dN}{dt}\)</span> vs. <span class="math inline">\(N\)</span> for <span class="math inline">\(0 \le N \le 55\)</span>. For which values of <span class="math inline">\(N\)</span> is the growth rate (<span class="math inline">\(\frac{dN}{dt}\)</span>) positive or negative? Which values of N are fixed points? (0.5 marks)</p></li>
+<li><p>Sketch a phase portrait on paper or digitally, leaving <span class="math inline">\(A\)</span> and <span class="math inline">\(K\)</span> as variables (i.e. without choosing values for <span class="math inline">\(A\)</span> and <span class="math inline">\(K\)</span>, but with <span class="math inline">\(0 \le A &lt; K\)</span>). Mark the direction of the derivative in each region with arrows and label the fixed points as “stable” or “unstable”. (1 mark)</p></li>
+<li><p>Use R to plot the <strong>per capita</strong> growth rate (<span class="math inline">\(\frac{1}{N}\frac{dN}{dt}\)</span>) vs. <span class="math inline">\(N\)</span> for this model of the Allee effect and for the logistic growth model: <span class="math inline">\(\frac{dN}{dt} = rN(1-\frac{N}{K})\)</span>.</p>
+<ul>
+<li><p>What do you notice about the density (<span class="math inline">\(N\)</span>) dependence of the per capita growth rate in each case? Hint: in the logistic model, the growth rate <strong>per capita</strong> (per organism) decreases in a straight line as <span class="math inline">\(N\)</span> increases.</p></li>
+<li><p>What happens to the Allee effect as <span class="math inline">\(A\)</span> decreases? Plot curves for <span class="math inline">\(A=0\)</span> and a few values of <span class="math inline">\(A&gt;0\)</span>.</p></li>
+<li><p>The parameter <span class="math inline">\(A\)</span> controls the strength of the Allee effect: for <span class="math inline">\(A &gt; 0\)</span>, the Allee effect is said to be strong, and for <span class="math inline">\(A=0\)</span>, the Allee effect is weak. What will happen to a population experiencing a strong Allee effect if the population size falls below <span class="math inline">\(A\)</span>? What will happen to a population experiencing a weak Allee effect if the population size falls below <span class="math inline">\(A\)</span>? (1 mark)</p></li>
+</ul></li>
+<li><p>Describe two biological situations in which you might expect to see an Allee effect (either weak or strong). (0.5 marks)</p></li>
+</ol></li>
+<li><p>The Canadian lynx population cycle (3 marks)</p>
+<p>The Canadian lynx experiences large periodic changes in its population size over a timescale of several years. This is thought to be driven by oscillations in the population size of the snowshoe hare, the primary food source for the lynx. Read more about the lynx population cycle on this <a href="https://www.enr.gov.nt.ca/en/services/lynx/lynx-snowshoe-hare-cycle">Northwest Territories website</a>.</p>
+<p>R has a built-in dataset called <code>lynx</code> which contains annual population measurements for the Canadian lynx as a time series.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Plot <code>lynx</code> vs. time in years using either <code>ggplot</code> or <code>qplot</code>. Plot points (<code>geom_point</code>) and a connecting line (<code>geom_line</code>). Create a time series that starts at 0 and ends at the total number of years in the dataset (total years <span class="math inline">\(=  1934-1821\)</span>). By eye, estimate the time between peaks in the population. (0.5 marks)</p></li>
+<li><p>Define a function called <code>sine_model</code> that takes 5 arguments: a vector of years for the x-axis and four parameters (amplitude, period, phase, and offset). Recall the general formula for a sine wave:</p>
+<p><span class="math display">\[y = A \text{sin}(kx - b) + c\]</span></p>
+<p>where <span class="math inline">\(k = 2\pi / T\)</span>, <span class="math inline">\(T\)</span> is the period or length of time between peaks, <span class="math inline">\(A\)</span> is the amplitude, <span class="math inline">\(b\)</span> is the phase, and <span class="math inline">\(c\)</span> is the offset. Using a value of <span class="math inline">\(A = c = 1700\)</span> for both the amplitude and offset and a value of <span class="math inline">\(b = 2.75\)</span> for the phase, plot the lynx data as before and add a sine curve using your guess of the timescale from part (a) for the period. Use a colour other than black to plot the sine wave. Note that the x axis must start at 0 in order for the offset of <span class="math inline">\(2.75\)</span> to match the data. (0.5 marks)</p></li>
+<li><p>Use least-squares fitting to refine your estimate of the lynx cycle length. (1.5 marks)</p>
+<ul>
+<li>Make a range of values for the period that span your guess from part (a).</li>
+<li>Use the <code>sapply</code> function to calculate a predicted dataset using a sine model. Calculate the sum of the difference (<em>residuals</em>) between the lynx data and your prediction, then return the sum of the residuals squared.</li>
+<li>Plot the sum of the residuals squared vs. the range of period values. By eye, what is the minimum of this curve? What value of the period gives the best fit?</li>
+<li>Use the function <code>which</code> to extract the period value that gives the best fit. What is your calculated length of the lynx population cycle?</li>
+</ul></li>
+<li><p>Plot the lynx data again and plot your best fit curve on top. Does your estimate of the cycle length match the literature? Why or why not? (Find and cite a resource that gives an estimate of the lynx population cycle.) (0.5 marks)</p></li>
+</ol></li>
+</ol>
+
+
+<hr>
+
+<p>This work is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>. See the <a href="LICENSE.html">licensing</a> page for more details about copyright information.</p>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
